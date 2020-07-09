@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
 import Web3 from 'web3';
 import './App.css';
 import Ethreon from '../abis/Ethreon.json';
 
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) // leaving out the arguments will default to these values
+toast.configure()
 
 class App extends Component {
 
@@ -63,9 +66,10 @@ class App extends Component {
       this.state.contract.methods.newCreatorSignup().send({ from: this.state.account }).then(function(result) {
         console.log(result);
       })
+      this.notify('Welcome to the family!')
     }
     else {
-      console.log('Welcome Back Creator!')
+      this.notify('Welcome Back!')
     }
   }
 
@@ -102,6 +106,7 @@ class App extends Component {
         console.error(error)
         return
       }
+      this.notify('Updating Image!')
       this.state.contract.methods.addCreatorImage(result[0].hash).send({ from: this.state.account }).then((r) => {
         console.log('Result', r)
         console.log('Image hash ', result[0].hash)
@@ -119,6 +124,7 @@ class App extends Component {
         console.error(error)
         return
       }
+      this.notify('Updating Content!')
       this.state.contract.methods.addCreatorContent(result[0].hash).send({ from: this.state.account }).then((r) => {
         console.log('Result', r)
         console.log('Content hash ', result[0].hash)
@@ -127,24 +133,29 @@ class App extends Component {
     })
   }
 
+  notify = (message) => {
+    toast.info(message, {position: toast.POSITION.TOP_RIGHT, autoclose: 100})
+  }
+
   render() {
     return (
-      <div>
+      <div className="master-container">
         <div className="container-fluid mt-5">
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
               <div className="content mr-auto ml-auto">
                 <a rel="noopener noreferrer">
-                  <h1>Creator's Dashboard</h1>
+                  <div className="main-title"><h1>Creator's Dashboard</h1></div>
                 </a>
+                <br /><br /><br />
                 <p>&nbsp;</p>
-                <h2>Change Image</h2>
+                <h2>Change Image</h2><br />
                 <form onSubmit={this.onSubmitImage} >
                   <input type='file' onChange={this.captureFile} />
                   <input type='submit' />
                 </form>
                 <p>&nbsp;</p>
-                <h2>Change Content</h2>
+                <h2>Change Content</h2><br />
                 <form onSubmit={this.onSubmitContent} >
                   <input type='file' onChange={this.captureFile} />
                   <input type='submit' />
